@@ -140,17 +140,6 @@ void pbf_optimize(pbf_chunk_t *chunk) {
     }
     continue;
   }
-  /* get rid of DELETE */
-  uint32_t *old_code = chunk->code;
-  size_t old_len = chunk->len;
-  pbf_chunk_init(chunk);
-  for (size_t i = 0; i < old_len; ++i) {
-    if (old_code[i] == DELETE) {
-      continue;
-    }
-    pbf_chunk_write_32(chunk, old_code[i]);
-  }
-  free(old_code);
 }
 
 #undef DELETE
