@@ -12,7 +12,7 @@
 
 /* options */
 
-#define BENCHMARK
+/* #define BENCHMARK */
 /* ↑ uncomment to enable benchmarks */
 
 /* optional includes */
