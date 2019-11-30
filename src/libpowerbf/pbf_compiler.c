@@ -61,11 +61,10 @@ void pbf_compile(pbf_chunk_t *c, pbf_instream_t *in) {
   pbf_chunk_write_op(c, PBF_OP_HLT, 0);
 }
 
-#define DELETE 0xFFFFFFFF
-
 void pbf_optimize(pbf_chunk_t *chunk) {
   /* optimize */
   while (true) {
+    size_t del_begin, del_len;
     for (size_t i = 0; i < chunk->len; ++i) {
       pbf_opcode_t opcode = chunk->code[i] >> 28;
       uint32_t operand = chunk->code[i] & 0x0FFFFFFFF;
@@ -78,10 +77,14 @@ void pbf_optimize(pbf_chunk_t *chunk) {
         for (size_t j = i + 1; j < chunk->len; ++j) {
           pbf_opcode_t other_opcode = chunk->code[j] >> 28;
           if (other_opcode == opcode) {
+            if (!streak) {
+              del_begin = j;
+              del_len = 0;
+            }
             uint32_t other_operand = chunk->code[j] & 0x0FFFFFFF;
             streak = true;
             operand += other_operand;
-            chunk->code[j] = DELETE;
+            ++del_len;
           } else {
             break;
           }
@@ -107,14 +110,16 @@ void pbf_optimize(pbf_chunk_t *chunk) {
             uint32_t next_operand = chunk->code[i + 1] & 0x0FFFFFFF; \
             int diff = (int)operand - (int)next_operand; \
             if (diff == 0) { \
-              chunk->code[i] = DELETE; \
-              chunk->code[i + 1] = DELETE; \
+              del_begin = i; \
+              del_len = 2; \
             } else if (diff > 0) { \
               pbf_chunk_patch_operand(chunk, i, diff); \
-              chunk->code[i + 1] = DELETE; \
+              del_begin = i + 1; \
+              del_len = 1; \
             } else if (diff < 0) { \
-              chunk->code[i] = DELETE; \
               pbf_chunk_patch_operand(chunk, i + 1, -diff); \
+              del_begin = i; \
+              del_len = 1; \
             } \
             balance = true; \
           } \
@@ -133,11 +138,7 @@ void pbf_optimize(pbf_chunk_t *chunk) {
     break;
   opt_done:
     /* remove any DELETE markers */
-    for (size_t i = chunk->len - 1; i < -1UL /* unsigned business™ */; --i) {
-      if (chunk->code[i] == DELETE) {
-        pbf_chunk_erase(chunk, i);
-      }
-    }
+    pbf_chunk_erase(chunk, del_begin, del_len);
     continue;
   }
 }

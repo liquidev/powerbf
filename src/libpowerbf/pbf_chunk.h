@@ -22,7 +22,7 @@ void pbf_chunk_deinit(pbf_chunk_t *chunk);
 
 size_t pbf_chunk_write_32(pbf_chunk_t *chunk, uint32_t code);
 size_t pbf_chunk_write_op(pbf_chunk_t *chunk, pbf_opcode_t op, uint32_t rest);
-uint32_t pbf_chunk_erase(pbf_chunk_t *chunk, size_t offset);
+uint32_t pbf_chunk_erase(pbf_chunk_t *chunk, size_t offset, size_t len);
 
 void pbf_chunk_patch_opcode(pbf_chunk_t *chunk, size_t offset, pbf_opcode_t op);
 void pbf_chunk_patch_operand(pbf_chunk_t *chunk,

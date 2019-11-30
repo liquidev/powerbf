@@ -12,7 +12,7 @@
 
 /* options */
 
-/* #define BENCHMARK */
+#define BENCHMARK
 /* ↑ uncomment to enable benchmarks */
 
 /* optional includes */
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
   /* -a switch (disassemble bytecode) */
   if (argp_data.disassemble) {
     pbf_chunk_disassemble(&bytecode);
-    goto cleanup;
+    goto cleanup_chunk;
   }
 
   /* run */
@@ -195,8 +195,8 @@ int main(int argc, char *argv[]) {
   #endif
 
   /* clean up */
-cleanup:
   pbf_vm_deinit(&vm);
+cleanup_chunk:
   pbf_chunk_deinit(&bytecode);
   if (!read_from_stdin) {
     ifs_close(&instream);

@@ -47,18 +47,18 @@ void pbf_chunk_patch_operand(pbf_chunk_t *chunk,
   chunk->code[offset] |= (operand & 0x0FFFFFFF);
 }
 
-uint32_t pbf_chunk_erase(pbf_chunk_t *chunk, size_t offset) {
+uint32_t pbf_chunk_erase(pbf_chunk_t *chunk, size_t offset, size_t len) {
   uint32_t result = chunk->code[offset];
-  for (size_t i = offset + 1; i < chunk->len; ++i) {
-    chunk->code[i - 1] = chunk->code[i];
+  for (size_t i = offset + len; i < chunk->len; ++i) {
+    chunk->code[i - len] = chunk->code[i];
   }
-  --chunk->len;
+  chunk->len -= len;
   for (size_t i = 0; i < chunk->len; ++i) {
     pbf_opcode_t opcode = chunk->code[i] >> 28;
     if (opcode == PBF_OP_JZE || opcode == PBF_OP_JNZ) {
       uint32_t operand = chunk->code[i] & 0x0FFFFFFF;
       if (operand >= offset) {
-        pbf_chunk_patch_operand(chunk, i, operand - 1);
+        pbf_chunk_patch_operand(chunk, i, operand - len);
       }
     }
   }
