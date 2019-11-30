@@ -178,6 +178,7 @@ int main(int argc, char *argv[]) {
   pbf_vm_t vm;
   pbf_vm_init(&vm);
   vm.put_impl = vm_put;
+  vm.get_impl = vm_get;
 
   #ifdef BENCHMARK
   ticks run_start = getticks();
