@@ -48,7 +48,7 @@ Here are the results:
 **But how is it so much better?**
 
 First of all, powerbf does more optimization than microbf. While it does not do
-it in the same way (optimizing during compilation in microvf vs after
+it in the same way (optimizing during compilation in microbf vs after
 compilation in powerbf), it can still yield quite an improvement in all
 sorts if brainfuck programs, especially badly-written ones.
 
