@@ -104,9 +104,14 @@ void arg_file(pbf_argp_t *p, char *val) {
 /* VM IO implementation */
 
 void vm_put(pbf_vm_t *vm, char c) {
-  printf("%c", c);
+  putchar(c);
 
   (void)vm;
+}
+
+char vm_get(pbf_vm_t *vm) {
+  (void)vm;
+  return getchar();
 }
 
 /* main() */
