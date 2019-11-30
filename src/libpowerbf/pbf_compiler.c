@@ -137,7 +137,7 @@ void pbf_optimize(pbf_chunk_t *chunk) {
     }
     break;
   opt_done:
-    /* remove any DELETE markers */
+    /* delete marked section */
     pbf_chunk_erase(chunk, del_begin, del_len);
     continue;
   }
