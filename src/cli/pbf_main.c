@@ -4,11 +4,21 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "pbf_args.h"
-#include "pbf_chunk.h"
-#include "pbf_compiler.h"
-#include "pbf_panic.h"
-#include "pbf_vm.h"
+#include <pbf_args.h>
+#include <pbf_chunk.h>
+#include <pbf_compiler.h>
+#include <pbf_panic.h>
+#include <pbf_vm.h>
+
+/* options */
+
+/* #define BENCHMARK */
+/* ↑ uncomment to enable benchmarks */
+
+/* optional includes */
+#ifdef BENCHMARK
+# include "cycle.h"
+#endif
 
 /* file instream implementation */
 
@@ -131,13 +141,27 @@ int main(int argc, char *argv[]) {
   }
 
   /* compile */
+  #ifdef BENCHMARK
+  ticks total_start = getticks();
+  #endif
+
   pbf_chunk_t bytecode;
   pbf_chunk_init(&bytecode);
+
+  #ifdef BENCHMARK
+  ticks compile_start = getticks();
+  #endif
 
   pbf_compile(&bytecode, &instream);
   if (argp_data.optimize) {
     pbf_optimize(&bytecode);
   }
+
+  #ifdef BENCHMARK
+  ticks compile_end = getticks();
+  double compile_time = elapsed(compile_end, compile_start);
+  fprintf(stderr, "compile: %f\n", compile_time);
+  #endif
 
   /* -a switch (disassemble bytecode) */
   if (argp_data.disassemble) {
@@ -150,7 +174,19 @@ int main(int argc, char *argv[]) {
   pbf_vm_init(&vm);
   vm.put_impl = vm_put;
 
+  #ifdef BENCHMARK
+  ticks run_start = getticks();
+  #endif
+
   pbf_vm_run(&vm, &bytecode);
+
+  #ifdef BENCHMARK
+  ticks run_end = getticks();
+  double run_time = elapsed(run_end, run_start);
+  double total_time = elapsed(run_end, total_start);
+  fprintf(stderr, "run: %f\n", run_time);
+  fprintf(stderr, "total: %f\n", total_time);
+  #endif
 
   /* clean up */
 cleanup:
