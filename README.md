@@ -69,3 +69,15 @@ capable of executing (because it ran out of memory before the program could
 finish). An example of such program is [`mandelbrot.b`][mandelbrot.b].
 
   [mandelbrot.b]: https://github.com/pablojorge/brainfuck/blob/master/programs/mandelbrot.bf
+
+Another thing powerbf does better is the bytecode representation. While microbf
+used variable length `uint8_t`-based bytecode, powerbf uses fixed-length
+`uint32_t`-based codes. This makes the bytecode larger, but also allows for an
+important loop optimization: microbf used an offset table in the chunk, which
+could fit 256 offsets **at most**. powerbf on the other hand, can fit as many as
+you'd like, as long as your program's bytecode doesn't exceed 268435456
+instructions (which is unlikely). The opcode occupies the 4 most significant
+bits of the integer, and the rest is the operand. Because the operand is so big,
+the jump destination can be stored right within the remaining 28 bits of the
+instruction, thus making the jump more immediate, because a table lookup isn't
+needed.
